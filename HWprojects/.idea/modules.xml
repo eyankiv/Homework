@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/HW5/HW5.iml" filepath="$PROJECT_DIR$/HW5/HW5.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HW8/HW8.iml" filepath="$PROJECT_DIR$/HW8/HW8.iml" />
+      <module fileurl="file://$PROJECT_DIR$/HWprojects.iml" filepath="$PROJECT_DIR$/HWprojects.iml" />
+    </modules>
+  </component>
+</project>
