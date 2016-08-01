@@ -11,7 +11,7 @@ public class Duck extends Animals {
         System.out.println("quak quak!");
     }
 
-    void makeSound(){
+    public void makeSound(){
         quack();
     }
 }
