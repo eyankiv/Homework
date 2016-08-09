@@ -4,14 +4,18 @@ public class Main {
 
     public static void main(String[] args) {
        // Canvas[][] mySquare = new Canvas[3][4];
-        drawRectangle(4,5);
+        Canvas canvas = new Canvas();
+        canvas.drawRectangle(4,5,10,30);
+        canvas.renderScreen();
     }
 
 
+/*
 
     public static void drawRectangle(int width, int height){
        //method efficient old
-        /* for (int i = 0; i < width; i++) {
+        */
+/* for (int i = 0; i < width; i++) {
             System.out.print("*");
         }
         System.out.println();
@@ -25,7 +29,8 @@ public class Main {
         }
         for (int i = 0; i < width; i++) {
             System.out.print("*");
-        }*/
+        }*//*
+
 
         //method simple old
         for (int i = 0; i < height; i++) {
@@ -35,7 +40,7 @@ public class Main {
             }
             System.out.println();
         }
+*/
 
 
-    }
 }
