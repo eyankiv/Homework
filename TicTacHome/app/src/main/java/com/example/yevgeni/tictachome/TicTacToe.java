@@ -13,81 +13,86 @@ import java.util.Arrays;
  * Created by yevgeni on 05/11/2016.
  */
 
-public class TicTacToe extends LinearLayout {
+public class TicTacToe  {
     Button b;
 
-    char[] ticArray = new char[9];
-    boolean player = true; //false = player x; true = player 0.
-    int turn = 0;
+    public enum  CellValue{X,O,EMPTY}
 
-    public TicTacToe(Context context) {
-        super(context);
-        super.setOrientation(VERTICAL);
+    public enum  MoveResult{
+        VALID_MOVE,INVALID_MOVE,WIN,DRAW
+    }
 
-        LinearLayout topRow = new LinearLayout(context);
-        topRow.setOrientation(HORIZONTAL);
-
-        LinearLayout midRow = new LinearLayout(context);
-        midRow.setOrientation(HORIZONTAL);
-
-        LinearLayout bottomRow = new LinearLayout(context);
-        bottomRow.setOrientation(HORIZONTAL);
-
-        LayoutParams layoutParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        this.addView(topRow,layoutParams);
-        this.addView(midRow,layoutParams);
-        this.addView(bottomRow,layoutParams);
-
-        for (int i = 0; i < 9; i++) {
-            b = new Button(context);
-            b.setTag(i);
-            switch (i)
-            {
-                case 0:
-                case 1:
-                case 2:
-                        topRow.addView(b,layoutParams);
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                        midRow.addView(b,layoutParams);
-                    break;
-                case 6:
-                case 7:
-                case 8:
-                        bottomRow.addView(b,layoutParams);
-                    break;
-            }
-            b.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Button btn = (Button)view;
-                    //Toast.makeText(getContext(),"You Pressed button num "+view.getTag(),Toast.LENGTH_SHORT).show();
-                    btn.setText(player?"X":"O");
-                    int tag = Integer.valueOf(view.getTag().toString());
-                    // false = x, true = o;
-                    ticArray[tag] = player? 'X' : 'O';
-                    player = !player;
-                    turn++;
-                    btn.setEnabled(false);
-                    Toast.makeText(getContext(), Arrays.toString(ticArray), Toast.LENGTH_SHORT).show();
-                        if (ticArray[0]== 'X' && ticArray[1]== 'X' && ticArray[2] =='X'){
-                                Toast.makeText(getContext(),"The winner is X",Toast.LENGTH_SHORT).show();
-                        }
-                        if ((ticArray[0]== 'O' && ticArray[1]== 'O' && ticArray[2] =='O'))
-                        Toast.makeText(getContext(),"The winner is O",Toast.LENGTH_SHORT).show();
+    private CellValue[] ticArray;
+    private boolean player;
+    private int turnNumber;
 
 
 
-
-
-                }
-            });
-
-        }
+    public TicTacToe() {
+        ticArray = new CellValue[9];
+        resetGame();
 
     }
+
+    public void resetGame(){
+        for (int i = 0; i < 9; i++) {
+            ticArray[i] = CellValue.EMPTY;
+        }
+        player = true;
+        turnNumber = 0;
+    }
+
+
+
+    public MoveResult makeMove(int cell){
+        if(cell < 1 || cell >9)
+            return MoveResult.INVALID_MOVE;
+        cell--;
+        if (ticArray[cell] == CellValue.EMPTY){
+            turnNumber++;
+            ticArray[cell] = player? CellValue.X : CellValue.O;
+            player =!player;
+            if (turnNumber>=5 && CheckVictory(cell)){
+                return MoveResult.WIN;
+            }
+            if (turnNumber==9)
+                return MoveResult.DRAW;
+            return MoveResult.VALID_MOVE;
+
+        }
+        return MoveResult.INVALID_MOVE;
+
+    }
+
+    private boolean  CheckVictory(int cell){
+        int row = cell/3;
+        int column = cell%3;
+        if (ticArray[column] == ticArray[column+3] && ticArray[column] == ticArray[column+6])
+            return true;
+        row *=3;
+        if (ticArray[row] == ticArray[row+1] && ticArray[row]== ticArray[row+2])
+            return true;
+        //now we check diagonal
+        if(cell %2 ==0){
+            boolean diagonal1 = ticArray[0] != CellValue.EMPTY && ticArray[0]==ticArray[4] &&
+                    ticArray[0] == ticArray[8];
+            if (diagonal1)
+                return  true;
+            boolean diagonal2 = ticArray[2] != CellValue.EMPTY && ticArray[2]==ticArray[4] &&
+                    ticArray[2] == ticArray[6];
+            if (diagonal2)
+                return  true;
+        }
+        return false;
+    }
+
+    public boolean getPlayer(){
+        return player;
+    }
+
+    public int getTurn(){
+        return turnNumber;
+    }
+
 
 }
