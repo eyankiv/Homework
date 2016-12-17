@@ -9,6 +9,10 @@ public class SlidingPuzzle {
     private int emptyPiece;
     private int movingPiece;
 
+    public enum moveResult{
+        VALID_MOVE,INVALID_MOVE,OUT_OF_BOUNDS
+    }
+
     public SlidingPuzzle(int size) {
         this.size = size;
     }
@@ -26,9 +30,18 @@ public class SlidingPuzzle {
         this.emptyPiece = emptyPiece;
     }
 
-    public void makeAmove(int emptyPiece, int movingPiece){
-
+    public moveResult makeAmove(int size,int emptyPiece, int movingPiece){
+        //if (emptyPieceArrayPosition > -1 && movingPiece > -1 && emptyPieceArrayPosition< size * size && movingPiece <size*size){
+            if ((Math.abs(emptyPiece-movingPiece) == 1)|| (Math.abs(emptyPiece-movingPiece) == size))
+                return moveResult.VALID_MOVE;
+            return moveResult.INVALID_MOVE;
+        //}
+        //return moveResult.OUT_OF_BOUNDS;
     }
+
+    /*public void victoryCheck(){
+
+    }*/
 
 
 
