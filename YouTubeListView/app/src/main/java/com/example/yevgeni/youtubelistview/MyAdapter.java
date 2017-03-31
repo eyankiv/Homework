@@ -2,6 +2,7 @@ package com.example.yevgeni.youtubelistview;
 
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerFragment;
 import com.google.android.youtube.player.YouTubeThumbnailLoader;
 import com.google.android.youtube.player.YouTubeThumbnailView;
 
@@ -26,11 +29,13 @@ import java.util.Map;
 public class MyAdapter extends ArrayAdapter<YouTubeItem> {
 
     public static final String DEVELOPER_KEY = "AIzaSyAcTTf9dmb1D-AqJ41Y9KcCEnWANrSr1Po";
+    private static final String TAG = "initError";
     Activity activity;
     private final List<YouTubeItem> vodList;
-    private final Map<YouTubeThumbnailView,YouTubeThumbnailLoader> thumbViewToLoaderMap;
+    private final Map<YouTubeThumbnailView, YouTubeThumbnailLoader> thumbViewToLoaderMap;
     //ThumbListener thumbListener;
     String videoId;
+    YouTubePlayerFragment youTubePlayerFragment;
 
 
     public MyAdapter(Activity activity, List<YouTubeItem> vodList) {
@@ -49,8 +54,8 @@ public class MyAdapter extends ArrayAdapter<YouTubeItem> {
         ImageView vodThumb;
     }
 
-    public void releaseLoaders(){
-        for (YouTubeThumbnailLoader loader: thumbViewToLoaderMap.values()) {
+    public void releaseLoaders() {
+        for (YouTubeThumbnailLoader loader : thumbViewToLoaderMap.values()) {
             loader.release();
         }
     }
@@ -58,17 +63,16 @@ public class MyAdapter extends ArrayAdapter<YouTubeItem> {
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         View rowView = convertView;
         ViewContainer viewContainer = new ViewContainer();
         videoId = vodList.get(position).getmLink().substring(32);
 
         if (rowView == null) {
-            LayoutInflater inflater = activity.getLayoutInflater();
+            final LayoutInflater inflater = activity.getLayoutInflater();
             rowView = inflater.inflate(R.layout.list_item, null);
             viewContainer.vodTitle = (TextView) rowView.findViewById(R.id.videoTitleLbl);
-
 
             //Youtube operation
             viewContainer.tubeThumbnailView = (YouTubeThumbnailView) rowView.findViewById(R.id.tubePlayerLbl);
@@ -76,6 +80,8 @@ public class MyAdapter extends ArrayAdapter<YouTubeItem> {
                 @Override
                 public void onInitializationSuccess(YouTubeThumbnailView view, final YouTubeThumbnailLoader loader) {
                     loader.setVideo(videoId);
+                    thumbViewToLoaderMap.put(view, loader);
+                    view.setImageResource(R.drawable.loading_thumbnail);
                     loader.setOnThumbnailLoadedListener(new YouTubeThumbnailLoader.OnThumbnailLoadedListener() {
                         @Override
                         public void onThumbnailLoaded(YouTubeThumbnailView youTubeThumbnailView, String s) {
@@ -84,94 +90,69 @@ public class MyAdapter extends ArrayAdapter<YouTubeItem> {
 
                         @Override
                         public void onThumbnailError(YouTubeThumbnailView youTubeThumbnailView, YouTubeThumbnailLoader.ErrorReason errorReason) {
-
+                            youTubeThumbnailView.setImageResource(R.drawable.no_thumbnail);
                         }
                     });
 
                 }
 
                 @Override
-                public void onInitializationFailure(YouTubeThumbnailView youTubeThumbnailView, YouTubeInitializationResult youTubeInitializationResult) {
+                public void onInitializationFailure(YouTubeThumbnailView view, YouTubeInitializationResult initializationResult) {
+                    Log.d(TAG, "onInitializationFailure: " + initializationResult.getErrorDialog(activity, 123).toString());
 
                 }
 
 
             });
 
-            if (viewContainer.vodThumbLoader == null){
-                viewContainer.vodThumbLoader = thumbViewToLoaderMap.get(viewContainer.tubeThumbnailView);
-            }
-            viewContainer.vodThumb = (ImageView) rowView.findViewById(R.id.youTubeThumbLbl);
             rowView.setTag(viewContainer);
-        }else {
+
+//            if (viewContainer.vodThumbLoader == null){
+//                viewContainer.vodThumbLoader = thumbViewToLoaderMap.get(viewContainer.tubeThumbnailView);
+//            }
+//            viewContainer.vodThumb = (ImageView) rowView.findViewById(R.id.youTubeThumbLbl);
+//            rowView.setTag(viewContainer);
+//        }else {
+//            viewContainer = (ViewContainer) rowView.getTag();
+//            if (viewContainer.vodThumbLoader == null){
+//                viewContainer.vodThumbLoader = thumbViewToLoaderMap.get(viewContainer.tubeThumbnailView);//repeated
+//                //viewContainer.videoId = vodList.get(position).getmLink().substring(32);//repeated
+//                rowView.setTag(viewContainer.vodThumbLoader);//Not sure this is correct
+//            }
+//            /*else {
+//                //String videoId = vodList.get(position).getmLink().substring(32);
+//                viewContainer.vodThumbLoader.setVideo(vodList.get(position).getmLink().substring(32));
+//                viewContainer.tubeThumbnailView.setImageResource(R.drawable.loading_thumbnail);
+//            }*/
+//        }
+//        viewContainer.vodThumbLoader.setVideo(vodList.get(position).getmLink().substring(32));
+//        viewContainer.tubeThumbnailView.setImageResource(R.drawable.loading_thumbnail);
+//        viewContainer.vodTitle.setText(vodList.get(position).getMtitle());
+
+
+            // TODO: 03/03/2017 setThumb image :
+//        try {
+//            Uri imageLink = new URI(vodList.get(position).getmThumb());
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//        }
+//        viewContainer.vodThumb.setImageURI();
+
+            //viewContainer.vodWebView.loadUrl(vodList.get(position).getmLink());//watch out for invalid url.
+
+//        try {
+//            URI thumbUri = new URI(vodList.get(position).getmThumb());
+//            //viewContainer.vodThumb.setD;
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+        } else {
             viewContainer = (ViewContainer) rowView.getTag();
-            if (viewContainer.vodThumbLoader == null){
-                viewContainer.vodThumbLoader = thumbViewToLoaderMap.get(viewContainer.tubeThumbnailView);//repeated
-                //viewContainer.videoId = vodList.get(position).getmLink().substring(32);//repeated
-                rowView.setTag(viewContainer.vodThumbLoader);//Not sure this is correct
-            }
-            /*else {
-                //String videoId = vodList.get(position).getmLink().substring(32);
-                viewContainer.vodThumbLoader.setVideo(vodList.get(position).getmLink().substring(32));
-                viewContainer.tubeThumbnailView.setImageResource(R.drawable.loading_thumbnail);
-            }*/
         }
-        viewContainer.vodThumbLoader.setVideo(vodList.get(position).getmLink().substring(32));
-        viewContainer.tubeThumbnailView.setImageResource(R.drawable.loading_thumbnail);
         viewContainer.vodTitle.setText(vodList.get(position).getMtitle());
-
-
-        // TODO: 03/03/2017 setThumb image :
-        /*try {
-            Uri imageLink = new URI(vodList.get(position).getmThumb());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        viewContainer.vodThumb.setImageURI();*/
-
-        //viewContainer.vodWebView.loadUrl(vodList.get(position).getmLink());//watch out for invalid url.
-
-        try {
-            URI thumbUri = new URI(vodList.get(position).getmThumb());
-            //viewContainer.vodThumb.setD;
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
+        //viewContainer.tubeThumbnailView.initialize(DEVELOPER_KEY,);
 
         return rowView;
     }
 
-    /*private final class ThumbListener implements  YouTubeThumbnailView.OnInitializedListener,YouTubeThumbnailLoader.OnThumbnailLoadedListener{
 
-
-        @Override
-        public void onInitializationSuccess(YouTubeThumbnailView view, YouTubeThumbnailLoader loader) {
-            loader.setOnThumbnailLoadedListener(this);
-            thumbViewToLoaderMap.put(view,loader);
-            view.setImageResource(R.drawable.loading_thumbnail);
-            ViewContainer viewContainer = (ViewContainer)view.getTag() ;/*//****need to get
-//            String videoId = viewContainer.
-//            loader.setVideo(videoId);
-
-        }
-
-        @Override
-        public void onInitializationFailure(YouTubeThumbnailView youTubeThumbnailView, YouTubeInitializationResult youTubeInitializationResult) {
-            youTubeThumbnailView.setImageResource(R.drawable.no_thumbnail);
-        }
-
-        @Override
-        public void onThumbnailLoaded(YouTubeThumbnailView youTubeThumbnailView, String s) {
-
-
-        }
-
-        @Override
-        public void onThumbnailError(YouTubeThumbnailView youTubeThumbnailView, YouTubeThumbnailLoader.ErrorReason errorReason) {
-            youTubeThumbnailView.setImageResource(R.drawable.no_thumbnail);
-
-        }
-     */
-    }
 }
